@@ -1,0 +1,45 @@
+{
+    "services": [
+        "t_machine",
+        "t_measurement"
+    ],
+    "prefix": "FW-",
+    "list": [
+        {
+             "source": "orion-shopfloor:1026",
+             "target": "orion-innovalia:1026",
+             "description": "ShopFloor_Ext-Innovalia_Ext",
+             "service": "t_machine",
+             "path": "/",
+             "template": "orion",
+             "mark": 1
+        },
+        {
+            "source": "orion-shopfloor:1026",
+            "target": "orion-gf:1026",
+            "description": "ShopFloor_Ext-GF_Ext",
+            "service": "t_measurement",
+            "path": "/",
+            "template": "orion",
+            "mark": 2
+        },
+        {
+            "source": "orion-shopfloor:1026",
+            "target": "quantumleap:8668",
+            "description": "ShopFloor_Ext-QuantumLeap",
+            "service": "t_machine",
+            "path": "/",
+            "template": "ql",
+            "mark": 3
+        },
+        {
+            "source": "orion-shopfloor:1026",
+            "target": "quantumleap:8668",
+            "description": "ShopFloor_Ext-QuantumLeap",
+            "service": "t_measurement",
+            "path": "/",
+            "template": "ql",
+            "mark": 4
+        }
+    ]
+}

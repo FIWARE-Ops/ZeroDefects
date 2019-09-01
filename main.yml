@@ -1,0 +1,15 @@
+- hosts: server
+  gather_facts: true
+  become: false
+  tasks:
+  - name: machine
+    import_tasks: machine.yml
+
+  - name: docker
+    import_tasks: docker.yml
+
+  - name: add secrets
+    import_tasks: secrets.yml
+
+  - name: showcase
+    import_tasks: showcase.yml

@@ -1,0 +1,133 @@
+---
+  - name: pull private images
+    shell: docker pull {{ item }}
+    with_items:
+      - repo.lab.fiware.org/stream-machine-coordinatemeasuring
+      - repo.lab.fiware.org/nginx
+
+  - name: create crate folder
+    file:
+      path: /home/ubuntu/showcase/crate
+      state: "{{ item }}"
+      owner: ubuntu
+      group: ubuntu
+    with_items:
+      - absent
+      - directory
+
+  - name: create grafana folder
+    become: true
+    file:
+      path: /home/ubuntu/showcase/grafana/
+      state: "{{ item }}"
+      owner: 472
+      group: ubuntu
+    with_items:
+      - absent
+      - directory
+
+  - name: create mongo folder
+    become: true
+    file:
+      path: /home/ubuntu/showcase/mongo
+      state: "{{ item }}"
+      owner: 999
+      group: ubuntu
+    with_items:
+      - absent
+      - directory
+
+  - name: copy docker-compose
+    copy:
+      src: showcase/docker-compose.yml
+      dest: /home/ubuntu/showcase/docker-compose.yml
+
+  - name: copy grafana dynamic
+    become: true
+    synchronize:
+      src: showcase/dynamic/
+      dest: /home/ubuntu/showcase/grafana/
+      delete: true
+
+  - name: change perms
+    become: true
+    file:
+      dest: /home/ubuntu/showcase/grafana/
+      owner: 472
+      group: ubuntu
+      recurse: yes
+
+  - name: sync files
+    become: true
+    synchronize:
+      src: showcase/static/
+      dest: /home/ubuntu/showcase/static/
+      delete: true
+
+  - name: rm stack
+    shell: docker stack rm zerodefects
+
+  - name: clean host
+    shell: docker {{ item }} prune -f
+    with_items:
+      - container
+      - volume
+
+  - name: run stack
+    shell: docker stack deploy --compose-file docker-compose.yml zerodefects
+    args:
+      chdir: /home/ubuntu/showcase
+
+  - name: check if mongo up
+    shell: docker service logs zerodefects_mongo 2>&1 | sed 's/"//g'
+    register: test
+    until: test.stdout.find('waiting for connections on port 27017') != -1
+    delay: 5
+    retries: 5
+
+  - name: check if orion up
+    shell: docker service logs zerodefects_orion-{{ item }} 2>&1 | sed 's/"//g'
+    register: test
+    until: test.stdout.find('Startup completed') != -1
+    delay: 5
+    retries: 5
+    with_items:
+      - gf
+      - innovalia
+      - shopfloor
+
+  - name: check if quantumleap up
+    shell: docker service logs zerodefects_quantumleap 2>&1 | sed 's/"//g'
+    register: test
+    until: test.stdout.find('Running on') != -1
+    delay: 5
+    retries: 5
+
+  - name: check if crate up
+    shell: docker service logs zerodefects_crate 2>&1 | sed 's/"//g'
+    register: test
+    until: test.stdout.find('started') != -1
+    delay: 6
+    retries: 5
+
+  - name: check if grafana up
+    shell: docker service logs zerodefects_grafana 2>&1 | sed 's/"//g'
+    register: test
+    until: test.stdout.find('HTTP Server Listen') != -1
+    delay: 5
+    retries: 5
+
+  - name: check if nginx up
+    shell: docker service logs zerodefects_nginx 2>&1 | sed 's/"//g'
+    register: test
+    until: test.stdout.find('Service started') != -1
+    delay: 5
+    retries: 5
+
+  - name: subscribe orions
+    shell: docker run -it --rm --network showcase -v $(pwd)/subscriptions/:/opt/templates/ fiware/tool.subscribeorions --config /opt/templates/config.json
+    args:
+      chdir: /home/ubuntu/showcase/static/
+    register: test
+    failed_when:
+      - '"added :   4" not in test.stdout_lines'

@@ -1,0 +1,17 @@
+apiVersion: 1
+
+deleteDatasources:
+  - name: MM
+    orgId: 1
+
+datasources:
+- name: MM
+  type: crate-datasource
+  access: proxy
+  orgId: 1
+  url: http://crate:4200
+  version: 1
+  jsonData:
+    schema: mtt_machine
+    table: etmillingmachinetype
+    timeColumn: time_index
