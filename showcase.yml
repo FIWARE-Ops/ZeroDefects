@@ -1,10 +1,4 @@
 ---
-  - name: pull private images
-    shell: docker pull {{ item }}
-    with_items:
-      - repo.lab.fiware.org/stream-machine-coordinatemeasuring
-      - repo.lab.fiware.org/nginx
-
   - name: create crate folder
     file:
       path: /home/ubuntu/showcase/crate
@@ -41,6 +35,11 @@
     copy:
       src: showcase/docker-compose.yml
       dest: /home/ubuntu/showcase/docker-compose.yml
+
+  - name: pull images
+    shell: docker-compose pull
+    args:
+      chdir: /home/ubuntu/showcase/
 
   - name: copy grafana dynamic
     become: true
@@ -82,15 +81,15 @@
     shell: docker service logs zerodefects_mongo 2>&1 | sed 's/"//g'
     register: test
     until: test.stdout.find('waiting for connections on port 27017') != -1
-    delay: 5
-    retries: 5
+    delay: 7
+    retries: 7
 
   - name: check if orion up
     shell: docker service logs zerodefects_orion-{{ item }} 2>&1 | sed 's/"//g'
     register: test
     until: test.stdout.find('Startup completed') != -1
-    delay: 5
-    retries: 5
+    delay: 7
+    retries: 7
     with_items:
       - gf
       - innovalia
@@ -100,22 +99,22 @@
     shell: docker service logs zerodefects_quantumleap 2>&1 | sed 's/"//g'
     register: test
     until: test.stdout.find('Running on') != -1
-    delay: 5
-    retries: 5
+    delay: 7
+    retries: 7
 
   - name: check if crate up
     shell: docker service logs zerodefects_crate 2>&1 | sed 's/"//g'
     register: test
     until: test.stdout.find('started') != -1
-    delay: 6
-    retries: 5
+    delay: 7
+    retries: 7
 
   - name: check if grafana up
     shell: docker service logs zerodefects_grafana 2>&1 | sed 's/"//g'
     register: test
     until: test.stdout.find('HTTP Server Listen') != -1
-    delay: 5
-    retries: 5
+    delay: 7
+    retries: 7
 
   - name: check if nginx up
     shell: docker service logs zerodefects_nginx 2>&1 | sed 's/"//g'
