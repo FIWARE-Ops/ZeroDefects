@@ -14,7 +14,7 @@ services:
             - /home/ubuntu/showcase/mongo/:/data/db/
 
     orion-shopfloor:
-        command: -dbhost mongo -db shopfloor -logLevel INFO
+        command: -dbhost mongo -db shopfloor -logLevel ERROR
         depends_on:
             - mongo
         image: fiware/orion:2.2.0
@@ -28,7 +28,7 @@ services:
             - '1026:1026'
 
     orion-innovalia:
-        command: -dbhost mongo -db innovalia -logLevel INFO
+        command: -dbhost mongo -db innovalia -logLevel ERROR
         depends_on:
             - mongo
         image: fiware/orion:2.2.0
@@ -40,7 +40,7 @@ services:
         restart: unless-stopped
 
     orion-gf:
-        command: -dbhost mongo -db gf -logLevel INFO
+        command: -dbhost mongo -db gf -logLevel ERROR
         depends_on:
             - mongo
         image: fiware/orion:2.2.0

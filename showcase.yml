@@ -1,4 +1,13 @@
 ---
+  - name: rm stack
+    shell: docker stack rm zerodefects
+
+  - name: clean host
+    shell: docker {{ item }} prune -f
+    with_items:
+      - container
+      - volume
+
   - name: create crate folder
     file:
       path: /home/ubuntu/showcase/crate
@@ -63,15 +72,6 @@
       dest: /home/ubuntu/showcase/static/
       delete: true
 
-  - name: rm stack
-    shell: docker stack rm zerodefects
-
-  - name: clean host
-    shell: docker {{ item }} prune -f
-    with_items:
-      - container
-      - volume
-
   - name: run stack
     shell: docker stack deploy --compose-file docker-compose.yml zerodefects
     args:
@@ -85,9 +85,9 @@
     retries: 7
 
   - name: check if orion up
-    shell: docker service logs zerodefects_orion-{{ item }} 2>&1 | sed 's/"//g'
+    shell: docker run -it --rm --network showcase caa06d9c/support curl orion-{{ item }}:1026/version
     register: test
-    until: test.stdout.find('Startup completed') != -1
+    until: test.stdout.find('orion') != -1
     delay: 7
     retries: 7
     with_items:

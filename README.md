@@ -9,12 +9,12 @@ It has a recipe to redeploy a showcase.
 ## Requirements
   + Server
     + Ubuntu18+
-    + Ansible 2.3+
     + `python 2.7` and `setuptools` must be installed, use `sudo apt-get install -y python python-setuptools`
   + Ansible
+    + Version 2.3+
     + `config.json` with docker credentials must be put to `docker/`
     + `ansible_host` in `hosts` must be filled in with the external ip of the target host
-    + admin password for Grafana must be defined in secrets.yml
+    + `admin password` for Grafana must be defined in `secrets.yml`
     + please, verify the value of `MTU` parameter in `docker.yml` and `docker/daemon.json`
    + DNS
     + zerod.lab.fiware.org should point to a server
